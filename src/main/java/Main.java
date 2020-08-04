@@ -1,6 +1,11 @@
 public class Main {
 
   public static void main(String[] args) {
-    new VoltageControl();
+    try {
+      new VoltageControl();
+    } catch (Exception ex)
+    {
+      ex.printStackTrace();
+    }
   }
 }

@@ -1,34 +1,35 @@
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
-import javax.swing.table.TableColumn;
 
 public class VoltageControl extends JFrame {
 
   public final static String APP_TITLE = "Voltage Control";
 
-  private JSpinner voltage5;
-  private JSpinner voltage4;
-  private JSpinner voltage3;
-  private JSpinner voltage2;
-  private JSpinner voltage1;
   private JPanel panel;
   private JTable table;
 
-  public VoltageControl() {
+  public VoltageControl() throws IOException {
     $$$setupUI$$$();
+    table = new VoltageTableParams();
+    panel.add(table, new GridConstraints(0, 0, 1, 1,
+        GridConstraints.ANCHOR_CENTER,
+        GridConstraints.FILL_BOTH,
+        GridConstraints.SIZEPOLICY_WANT_GROW,
+        GridConstraints.SIZEPOLICY_WANT_GROW, null,
+        new Dimension(150, 50), null, 0, false));
     setTitle(APP_TITLE);
     setSize(200, 100);
     setContentPane(panel);
     setVisible(true);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    table.addColumn(new TableColumn());
-
   }
 
   /**
@@ -39,67 +40,7 @@ public class VoltageControl extends JFrame {
    */
   private void $$$setupUI$$$() {
     panel = new JPanel();
-    panel.setLayout(
-        new com.intellij.uiDesigner.core.GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
-    final JPanel panel1 = new JPanel();
-    panel1.setLayout(
-        new com.intellij.uiDesigner.core.GridLayoutManager(5, 1, new Insets(0, 0, 0, 0), 0, 0));
-    panel.add(panel1, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK
-            | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK
-            | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0,
-        false));
-    voltage1 = new JSpinner();
-    panel1.add(voltage1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    voltage2 = new JSpinner();
-    panel1.add(voltage2, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    voltage4 = new JSpinner();
-    panel1.add(voltage4, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    voltage5 = new JSpinner();
-    panel1.add(voltage5, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    voltage3 = new JSpinner();
-    panel1.add(voltage3, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    final JPanel panel2 = new JPanel();
-    panel2.setLayout(
-        new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-    panel.add(panel2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK
-            | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK
-            | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0,
-        false));
-    table = new JTable();
-    panel2.add(table, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1,
-        com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER,
-        com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW,
-        com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null,
-        new Dimension(150, 50), null, 0, false));
+    panel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
   }
 
   /**
