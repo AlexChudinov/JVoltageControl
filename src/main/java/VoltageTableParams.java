@@ -28,10 +28,6 @@ public class VoltageTableParams extends VoltageSpinnersPane {
   private static final String DEF_PROPERTIES_FILE_NAME =
       "data/config.properties";
 
-  private static final Object[] COLUMN_NAMES = new String[]{
-      "Electrode", "Value"
-  };
-
   private static final List<String> ELECTRODE_NAMES
       = new ArrayList<String>() {{
     add("Reflector Grid");
@@ -59,20 +55,24 @@ public class VoltageTableParams extends VoltageSpinnersPane {
     put("Accel.", (byte) 0x06);
   }};
 
-  private static final Font MODEL_FONT = new Font("Times", Font.BOLD, 30);
-
   public VoltageTableParams() throws IOException {
+    loadProperties();
+  }
+
+  private void loadProperties() throws IOException {
     Properties props = new Properties();
     InputStream in = new FileInputStream(DEF_PROPERTIES_FILE_NAME);
     props.load(in);
-    List<Double> values = new ArrayList<>();
-    for (String name : PROPERTIES_NAMES) {
-      values.add(Double.valueOf((String) props.get(name)));
-    }
+
     for (int i = 0; i < ELECTRODES.size(); ++i) {
-      addVoltageControl(
-          ELECTRODE_NAMES.get(i),
-          new VoltageSpinner(0.0, -1.0, 1.0, 0.1));
+      String propName = PROPERTIES_NAMES.get(i);
+      String electrodeName = ELECTRODE_NAMES.get(i);
+      addVoltageControl(electrodeName,
+          new VoltageSpinner(
+              Double.parseDouble((String) props.get(propName)),
+              Double.parseDouble((String)props.get(propName + "_min")),
+              Double.parseDouble((String)props.get(propName + "_max")),
+              Double.parseDouble((String)props.get(propName + "_step"))));
     }
   }
 }

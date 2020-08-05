@@ -1,4 +1,9 @@
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
+import java.text.ParseException;
 import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import javax.swing.JFrame;
@@ -17,7 +22,8 @@ public class VoltageSpinner extends JSpinner {
 
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    VoltageSpinner spinner = new VoltageSpinner(0.0, -100., 100., 0.1);
+    VoltageSpinner spinner =
+        new VoltageSpinner(0.0, -100., 100., 0.1);
     spinner.addValueListener(
         a -> LogManager.getRootLogger().info("Test value accepted " + a));
     frame.add(spinner);
@@ -36,14 +42,25 @@ public class VoltageSpinner extends JSpinner {
 
     ((JSpinner.DefaultEditor) getEditor())
         .getTextField()
+        .addFocusListener(new EditorFocusListener());
+
+    ((JSpinner.DefaultEditor) getEditor())
+        .getTextField()
         .setHorizontalAlignment(JTextField.CENTER);
   }
 
   private void mouseWheelListener(MouseWheelEvent mouseWheelEvent) {
     Double val = (Double) getModel().getValue()
-        + mouseWheelEvent.getScrollAmount()
+        + mouseWheelEvent.getWheelRotation()
         * (Double) ((SpinnerNumberModel) getModel()).getStepSize();
-    getModel().setValue(val);
+    Double max = (Double) ((SpinnerNumberModel) getModel()).getMaximum();
+    Double min = (Double) ((SpinnerNumberModel) getModel()).getMinimum();
+    if (val > max) {
+      val = max;
+    } else if (val < min) {
+      val = min;
+    }
+    setValue(val);
   }
 
   private void changeListener(ChangeEvent changeEvent) {
@@ -61,4 +78,21 @@ public class VoltageSpinner extends JSpinner {
     valueListener = op;
   }
 
+  private class EditorFocusListener implements FocusListener {
+
+    @Override
+    public void focusGained(FocusEvent e) {
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      try {
+        String str = ((JTextField) e.getComponent()).getText();
+        ((DefaultEditor) getEditor()).commitEdit();
+        Double val = (Double) getValue();
+      } catch (ParseException parseException) {
+        LogManager.getRootLogger().info(parseException.getMessage());
+      }
+    }
+  }
 }

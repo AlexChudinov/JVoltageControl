@@ -1,5 +1,7 @@
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -10,8 +12,6 @@ import javax.swing.WindowConstants;
 public class VoltageSpinnersPane extends JPanel {
 
   private VoltageSpinnerCollection collection = new VoltageSpinnerCollection();
-
-  private List<String> names = new ArrayList<>();
 
   public static void main(String[] args) {
     VoltageSpinnersPane pane = new VoltageSpinnersPane();
@@ -40,15 +40,47 @@ public class VoltageSpinnersPane extends JPanel {
       ((GridBagLayout) getLayout())
           .setConstraints(label, labelConstraints);
       add(label);
+      label.addMouseListener(new LabelMouseListener());
 
       GridBagConstraints spinnerConstraints
           = new GridBagConstraints();
       spinnerConstraints.gridx = 1;
       spinnerConstraints.gridy = GridBagConstraints.RELATIVE;
+      spinnerConstraints.ipadx = 40;
 
       ((GridBagLayout) getLayout())
           .setConstraints(spinner, spinnerConstraints);
       add(spinner);
+    }
+  }
+
+  private class LabelMouseListener implements MouseListener{
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      if(e.getButton() == MouseEvent.BUTTON3){
+        System.out.println(((JLabel)e.getComponent()).getText());
+      }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
   }
 }

@@ -10,6 +10,8 @@ public class Main {
   public static void main(String[] args) {
     try {
       JFrame frame = new JFrame();
+      frame.setSize(300, 200);
+      frame.setResizable(false);
       frame.setTitle(APP_NAME);
       frame.add(new VoltageTableParams());
       frame.setVisible(true);
