@@ -1,29 +1,14 @@
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 
-public class VoltageTableParams extends VoltageSpinnersPane {
+
+public class VoltageTableParams extends DoublePropertyPane {
 
   private static final String DEF_PROPERTIES_FILE_NAME =
       "data/config.properties";
@@ -68,7 +53,7 @@ public class VoltageTableParams extends VoltageSpinnersPane {
       String propName = PROPERTIES_NAMES.get(i);
       String electrodeName = ELECTRODE_NAMES.get(i);
       addVoltageControl(electrodeName,
-          new VoltageSpinner(
+          new DoubleSpinner(
               Double.parseDouble((String) props.get(propName)),
               Double.parseDouble((String)props.get(propName + "_min")),
               Double.parseDouble((String)props.get(propName + "_max")),

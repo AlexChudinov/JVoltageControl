@@ -6,29 +6,29 @@ import java.util.Objects;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-public class VoltageSpinnerCollection {
+public class DoublePropertiesCollection {
 
-  private Map<String, VoltageSpinner> spinners = new HashMap<>();
+  private Map<String, DoubleSpinner> spinners = new HashMap<>();
 
   private List<String> order = new ArrayList<>();
 
   public static void main(String[] args) {
-    VoltageSpinnerCollection collection = new VoltageSpinnerCollection();
-    collection.addVoltageControl("volts1", new VoltageSpinner(0.0, -100., 100., 0.1));
-    collection.addVoltageControl("volts2", new VoltageSpinner(0.0, -100., 100., 0.1));
+    DoublePropertiesCollection collection = new DoublePropertiesCollection();
+    collection.addVoltageControl("volts1", new DoubleSpinner(0.0, -100., 100., 0.1));
+    collection.addVoltageControl("volts2", new DoubleSpinner(0.0, -100., 100., 0.1));
     JFrame frame = new JFrame();
-    for(VoltageSpinner spinner : collection.getOrderedControls()){
+    for(DoubleSpinner spinner : collection.getOrderedControls()){
       frame.add(spinner);
     }
     frame.setVisible(true);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
   }
 
-  public VoltageSpinnerCollection() {
+  public DoublePropertiesCollection() {
 
   }
 
-  public boolean addVoltageControl(String name, VoltageSpinner spinner)
+  public boolean addVoltageControl(String name, DoubleSpinner spinner)
       throws NullPointerException {
     if (Objects.isNull(spinner)) {
       throw new NullPointerException();
@@ -41,15 +41,15 @@ public class VoltageSpinnerCollection {
     return false;
   }
 
-  public List<VoltageSpinner> getOrderedControls(){
-    List<VoltageSpinner> controls = new ArrayList<>();
+  public List<DoubleSpinner> getOrderedControls(){
+    List<DoubleSpinner> controls = new ArrayList<>();
     for(String name : order){
       controls.add(spinners.get(name));
     }
     return controls;
   }
 
-  public VoltageSpinner getSpinner(String name){
+  public DoubleSpinner getSpinner(String name){
     return spinners.get(name);
   }
 

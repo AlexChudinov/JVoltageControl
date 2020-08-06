@@ -1,7 +1,5 @@
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.text.ParseException;
 import java.util.Objects;
@@ -14,7 +12,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import org.apache.logging.log4j.LogManager;
 
-public class VoltageSpinner extends JSpinner {
+public class DoubleSpinner extends JSpinner {
 
   private Double value;
 
@@ -22,8 +20,8 @@ public class VoltageSpinner extends JSpinner {
 
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    VoltageSpinner spinner =
-        new VoltageSpinner(0.0, -100., 100., 0.1);
+    DoubleSpinner spinner =
+        new DoubleSpinner(0.0, -100., 100., 0.1);
     spinner.addValueListener(
         a -> LogManager.getRootLogger().info("Test value accepted " + a));
     frame.add(spinner);
@@ -31,7 +29,7 @@ public class VoltageSpinner extends JSpinner {
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
   }
 
-  public VoltageSpinner(double cur, double min, double max, double step) {
+  public DoubleSpinner(double cur, double min, double max, double step) {
     value = cur;
 
     setModel(new SpinnerNumberModel(cur, min, max, step));
