@@ -87,7 +87,6 @@ public class DoubleSpinner extends JSpinner {
       try {
         String str = ((JTextField) e.getComponent()).getText();
         ((DefaultEditor) getEditor()).commitEdit();
-        Double val = (Double) getValue();
       } catch (ParseException parseException) {
         LogManager.getRootLogger().info(parseException.getMessage());
       }
