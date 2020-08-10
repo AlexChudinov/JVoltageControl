@@ -1,9 +1,10 @@
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.util.TreeSet;
-import java.util.function.DoubleConsumer;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,32 +19,6 @@ import org.apache.logging.log4j.LogManager;
 public class VoltageSpinner extends JSpinner {
 
   private Voltage value;
-
-  public static void main(String[] args) throws Exception {
-    JFrame frame = new JFrame();
-    JPanel panel = new JPanel();
-    TreeSet<Double> voltageCalibrationValues = new TreeSet<Double>() {{
-      add(0.0);
-      add(10.0);
-    }};
-
-    TreeSet<Integer> voltageByteValues = new TreeSet<Integer>() {{
-      add(0x0000);
-      add(0xFFFF);
-    }};
-
-    Voltage voltage = new Voltage(
-        (byte)0x30,
-        5.,
-        voltageByteValues,
-        voltageCalibrationValues
-    );
-
-    panel.add(new VoltageSpinner(voltage, 0.0, 10.0, 0.1));
-    frame.add(panel);
-    frame.setVisible(true);
-    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-  }
 
   public VoltageSpinner(
       Voltage cur,
