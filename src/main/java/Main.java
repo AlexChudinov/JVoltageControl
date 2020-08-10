@@ -1,6 +1,4 @@
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
 import org.apache.logging.log4j.LogManager;
 
 public class Main {
@@ -9,13 +7,14 @@ public class Main {
 
   public static void main(String[] args) {
     try {
-      JFrame frame = new JFrame();
+      VoltageSpinner.main(args);
+      /*JFrame frame = new JFrame();
       frame.setSize(300, 200);
       frame.setResizable(false);
       frame.setTitle(APP_NAME);
       frame.add(new VoltageTableParams());
       frame.setVisible(true);
-      frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);*/
     } catch (Exception ex) {
       JOptionPane.showMessageDialog(
           null,

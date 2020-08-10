@@ -41,10 +41,10 @@ public class VoltageTableParams extends DoublePropertyPane {
   }};
 
   public VoltageTableParams() throws IOException {
-    loadProperties();
+    //loadProperties();
   }
 
-  private void loadProperties() throws IOException {
+  /*private void loadProperties() throws IOException {
     Properties props = new Properties();
     InputStream in = new FileInputStream(DEF_PROPERTIES_FILE_NAME);
     props.load(in);
@@ -53,11 +53,11 @@ public class VoltageTableParams extends DoublePropertyPane {
       String propName = PROPERTIES_NAMES.get(i);
       String electrodeName = ELECTRODE_NAMES.get(i);
       addVoltageControl(electrodeName,
-          new DoubleSpinner(
+          new VoltageSpinner(
               Double.parseDouble((String) props.get(propName)),
               Double.parseDouble((String)props.get(propName + "_min")),
               Double.parseDouble((String)props.get(propName + "_max")),
               Double.parseDouble((String)props.get(propName + "_step"))));
     }
-  }
+  }*/
 }

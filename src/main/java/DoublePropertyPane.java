@@ -11,23 +11,11 @@ public class DoublePropertyPane extends JPanel {
 
   private DoublePropertiesCollection collection = new DoublePropertiesCollection();
 
-  public static void main(String[] args) {
-    DoublePropertyPane pane = new DoublePropertyPane();
-    pane.addVoltageControl("volts1",
-        new DoubleSpinner(0.0, -10., 10, 0.1));
-    pane.addVoltageControl("volts2",
-        new DoubleSpinner(0.0, -10., 10., 0.1));
-    JFrame frame = new JFrame();
-    frame.add(pane);
-    frame.setVisible(true);
-    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-  }
-
   public DoublePropertyPane() {
     setLayout(new GridBagLayout());
   }
 
-  public void addVoltageControl(String name, DoubleSpinner spinner) {
+  public void addVoltageControl(String name, VoltageSpinner spinner) {
     if (collection.addVoltageControl(name, spinner)) {
       GridBagConstraints labelConstraints
           = new GridBagConstraints();

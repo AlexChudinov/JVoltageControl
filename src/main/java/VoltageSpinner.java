@@ -2,37 +2,57 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseWheelEvent;
 import java.text.ParseException;
-import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.DoubleConsumer;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
+import jssc.SerialPortException;
 import org.apache.logging.log4j.LogManager;
 
-public class DoubleSpinner extends JSpinner {
+public class VoltageSpinner extends JSpinner {
 
-  private Double value;
+  private Voltage value;
 
-  private DoubleConsumer valueListener;
-
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     JFrame frame = new JFrame();
-    DoubleSpinner spinner =
-        new DoubleSpinner(0.0, -100., 100., 0.1);
-    spinner.addValueListener(
-        a -> LogManager.getRootLogger().info("Test value accepted " + a));
-    frame.add(spinner);
+    JPanel panel = new JPanel();
+    TreeSet<Double> voltageCalibrationValues = new TreeSet<Double>() {{
+      add(0.0);
+      add(10.0);
+    }};
+
+    TreeSet<Integer> voltageByteValues = new TreeSet<Integer>() {{
+      add(0x0000);
+      add(0xFFFF);
+    }};
+
+    Voltage voltage = new Voltage(
+        (byte)0x30,
+        5.,
+        voltageByteValues,
+        voltageCalibrationValues
+    );
+
+    panel.add(new VoltageSpinner(voltage, 0.0, 10.0, 0.1));
+    frame.add(panel);
     frame.setVisible(true);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
   }
 
-  public DoubleSpinner(double cur, double min, double max, double step) {
+  public VoltageSpinner(
+      Voltage cur,
+      double min,
+      double max,
+      double step) {
     value = cur;
 
-    setModel(new SpinnerNumberModel(cur, min, max, step));
+    setModel(new SpinnerNumberModel(cur.getValue(), min, max, step));
 
     addChangeListener(this::changeListener);
 
@@ -62,18 +82,18 @@ public class DoubleSpinner extends JSpinner {
   }
 
   private void changeListener(ChangeEvent changeEvent) {
-    if (!getValue().equals(value)) {
-      LogManager.getRootLogger().info("Voltage value was changed from "
-          + value + " to " + getValue());
-      value = (Double) getValue();
-      if (!Objects.isNull(valueListener)) {
-        valueListener.accept(value);
+    try {
+      if (!getValue().equals(value.getValue())) {
+        LogManager.getRootLogger().info("Voltage value was changed from "
+            + value.getValue() + " to " + getValue());
+        value.setValue((double) getValue());
       }
+    } catch (SerialPortException ex) {
+      String msg = "Serial port communication error";
+      LogManager.getRootLogger().warn(msg);
+      JOptionPane.showMessageDialog(this,
+          "Serial port communication error");
     }
-  }
-
-  public void addValueListener(DoubleConsumer op) {
-    valueListener = op;
   }
 
   private class EditorFocusListener implements FocusListener {
