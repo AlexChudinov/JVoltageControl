@@ -10,10 +10,10 @@ public class ArduinoCommunication implements AutoCloseable {
 
   private SerialPort port;
 
-  private static ArduinoCommunication communication;
+  private static ArduinoCommunication communication = null;
 
   private static final byte[] TEST_BYTES = new byte[]{
-      0x30, 0x00, (byte) 0xFF
+      0x30, 0x00, 0x00
   };
 
   private static final int MAX_TIME = 3000;
@@ -24,7 +24,8 @@ public class ArduinoCommunication implements AutoCloseable {
       throws SerialPortException, InterruptedException {
     if (Objects.isNull(communication)) {
       communication = new ArduinoCommunication();
-      if (!communication.port.isOpened()) {
+      if (Objects.isNull(communication.port)
+          || !communication.port.isOpened()) {
         communication = null;
       }
     }
@@ -62,6 +63,7 @@ public class ArduinoCommunication implements AutoCloseable {
 
   public void writeBytes(final byte[] bytes) throws SerialPortException {
     port.writeBytes(bytes);
+    System.out.println("bytes=" + port.getOutputBufferBytesCount());
     LogManager.getRootLogger().info(
         "Bytes written to port: " + bytesToReadableString(bytes));
   }
@@ -134,7 +136,11 @@ public class ArduinoCommunication implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
+    if(Objects.isNull(communication)){
+      return;
+    }
     communication.closePort();
     communication = null;
+    LogManager.getRootLogger().info("Port closed");
   }
 }

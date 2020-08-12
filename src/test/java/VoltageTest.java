@@ -8,7 +8,7 @@ public class VoltageTest extends TestCase {
     try (ArduinoCommunication comm = ArduinoCommunication.getInstance()){
       TreeSet<Double> voltageCalibrationValues = new TreeSet<Double>() {{
         add(0.0);
-        add(10.0);
+        add(3000.0);
       }};
 
       TreeSet<Integer> voltageByteValues = new TreeSet<Integer>() {{
@@ -18,7 +18,7 @@ public class VoltageTest extends TestCase {
 
       Voltage voltage = new Voltage(
           (byte)0x30,
-          5.,
+          0.,
           voltageByteValues,
           voltageCalibrationValues
       );

@@ -1,22 +1,29 @@
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.text.ParseException;
-import java.util.TreeSet;
+import java.nio.ByteBuffer;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import jssc.SerialPortException;
 import org.apache.logging.log4j.LogManager;
 
-public class VoltageSpinner extends JSpinner {
+public class VoltageSpinner extends DoubleSpinnerWithEdit {
 
   private Voltage value;
 
@@ -25,24 +32,21 @@ public class VoltageSpinner extends JSpinner {
       double min,
       double max,
       double step) {
-    value = cur;
+    super(cur.getValue(), min, max, step);
 
-    setModel(new SpinnerNumberModel(cur.getValue(), min, max, step));
+    value = cur;
 
     addChangeListener(this::changeListener);
 
     addMouseWheelListener(this::mouseWheelListener);
 
-    ((JSpinner.DefaultEditor) getEditor())
-        .getTextField()
-        .addFocusListener(new EditorFocusListener());
-
-    ((JSpinner.DefaultEditor) getEditor())
-        .getTextField()
-        .setHorizontalAlignment(JTextField.CENTER);
+    setContextDialog(new PropertiesDlg(null, this));
   }
 
   private void mouseWheelListener(MouseWheelEvent mouseWheelEvent) {
+    if (mouseWheelEvent.getWheelRotation() == 0) {
+      setValue(value.getValue());
+    }
     Double val = (Double) getModel().getValue()
         + mouseWheelEvent.getWheelRotation()
         * (Double) ((SpinnerNumberModel) getModel()).getStepSize();
@@ -71,19 +75,169 @@ public class VoltageSpinner extends JSpinner {
     }
   }
 
-  private class EditorFocusListener implements FocusListener {
+  public class PropertiesDlg extends JDialog {
 
-    @Override
-    public void focusGained(FocusEvent e) {
+    private static final String MAX_VOLTAGE_LABEL = "Max voltage:";
+
+    private static final String STEP_LABEL = "Step:";
+
+    private final VoltageSpinner spinner;
+
+    private JSpinner byteSpinner;
+
+    private DoubleSpinnerWithEdit voltageSpinner;
+
+    public PropertiesDlg(JFrame frame, VoltageSpinner spinner) {
+      super(frame, true);
+      setTitle("Voltage control properties");
+      this.spinner = spinner;
+      JTabbedPane tabbedPane = new JTabbedPane();
+      tabbedPane.addTab("Spinner properties", createSpinnerPanel());
+      tabbedPane.addTab("Voltage properties", createVoltagePanel());
+      setContentPane(tabbedPane);
+      pack();
     }
 
-    @Override
-    public void focusLost(FocusEvent e) {
+    private JPanel createSpinnerPanel() {
+      JPanel panel = new JPanel(new GridLayout(0, 2));
+
+      JLabel maxLabel = new JLabel("Max:");
+
+      panel.add(maxLabel);
+
+      panel.add(new DoubleSpinnerWithEdit(
+          (Double) ((SpinnerNumberModel) spinner.getModel()).getMaximum(),
+          0.0,
+          10000.,
+          0.1
+      ));
+
+      JLabel stepLabel = new JLabel("Step:");
+
+      panel.add(stepLabel);
+
+      panel.add(new DoubleSpinnerWithEdit(
+          (double) ((SpinnerNumberModel) spinner.getModel()).getStepSize(),
+          0.0,
+          1000.,
+          0.1
+      ));
+      return panel;
+    }
+
+    private JPanel createVoltagePanel() {
+      JPanel panel = new JPanel(new GridBagLayout());
+
+      addAddressInfo(panel);
+
+      addVoltageValue(panel);
+
+      addByteValue(panel);
+
+      addButtons(panel);
+
+      return panel;
+    }
+
+    private void addButtons(JPanel panel) {
+      JButton testButton = new JButton("Test");
+      testButton.addActionListener(this::testButtonCallback);
+      GridBagConstraints testButtonConstraints = new GridBagConstraints();
+      testButtonConstraints.gridx = 0;
+      testButtonConstraints.gridy = GridBagConstraints.RELATIVE;
+      testButtonConstraints.gridwidth = 6;
+      testButtonConstraints.weightx = 0.5;
+      testButtonConstraints.weighty = 0.5;
+      testButtonConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(testButton, testButtonConstraints);
+    }
+
+    private void addByteValue(JPanel panel) {
+      JLabel label = new JLabel("Bytes:");
+      GridBagConstraints labelConstraints = new GridBagConstraints();
+      labelConstraints.gridx = 0;
+      labelConstraints.gridwidth = 3;
+      labelConstraints.gridy = GridBagConstraints.RELATIVE;
+      labelConstraints.weightx = 0.5;
+      labelConstraints.weighty = 0.5;
+      labelConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(label, labelConstraints);
+
+      byteSpinner = new JSpinner();
+      byteSpinner.setModel(
+          new SpinnerNumberModel(0, 0, 0xFFFF, 1));
+      GridBagConstraints valueConstraints = new GridBagConstraints();
+      valueConstraints.gridx = 3;
+      valueConstraints.gridy = GridBagConstraints.RELATIVE;
+      valueConstraints.gridwidth = 3;
+      valueConstraints.weightx = 0.5;
+      valueConstraints.weighty = 0.5;
+      valueConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(byteSpinner, valueConstraints);
+    }
+
+    private void addVoltageValue(JPanel panel) {
+      JLabel label = new JLabel("Volts:");
+      GridBagConstraints labelConstraints = new GridBagConstraints();
+      labelConstraints.gridx = 0;
+      labelConstraints.gridy = GridBagConstraints.RELATIVE;
+      labelConstraints.gridwidth = 3;
+      labelConstraints.weightx = 0.5;
+      labelConstraints.weighty = 0.5;
+      labelConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(label, labelConstraints);
+
+      voltageSpinner = new DoubleSpinnerWithEdit(
+          spinner.value.getValue(),
+          0.0,
+          10000.,
+          10.);
+      GridBagConstraints valueConstraints = new GridBagConstraints();
+      valueConstraints.gridx = 3;
+      valueConstraints.gridy = GridBagConstraints.RELATIVE;
+      valueConstraints.gridwidth = 3;
+      valueConstraints.weightx = 0.5;
+      valueConstraints.weighty = 0.5;
+      valueConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(voltageSpinner, valueConstraints);
+    }
+
+    private void addAddressInfo(JPanel panel) {
+      JLabel label = new JLabel("Address:");
+      GridBagConstraints labelConstraints = new GridBagConstraints();
+      labelConstraints.gridx = 0;
+      labelConstraints.gridy = GridBagConstraints.RELATIVE;
+      labelConstraints.gridwidth = 3;
+      labelConstraints.weightx = 0.5;
+      labelConstraints.weighty = 0.5;
+      labelConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(label, labelConstraints);
+
+      JLabel value = new JLabel("0x0" + Integer.toHexString(
+          spinner.value.getAddress() & 0xF));
+      GridBagConstraints valueConstraints = new GridBagConstraints();
+      valueConstraints.gridx = 3;
+      valueConstraints.gridy = GridBagConstraints.RELATIVE;
+      valueConstraints.gridwidth = 3;
+      valueConstraints.weightx = 0.5;
+      valueConstraints.weighty = 0.5;
+      valueConstraints.anchor = GridBagConstraints.CENTER;
+      panel.add(value, valueConstraints);
+    }
+
+    private void testButtonCallback(ActionEvent e) {
       try {
-        String str = ((JTextField) e.getComponent()).getText();
-        ((DefaultEditor) getEditor()).commitEdit();
-      } catch (ParseException parseException) {
-        LogManager.getRootLogger().info(parseException.getMessage());
+        int byteValue = (int) byteSpinner.getValue();
+        byte address = spinner.value.getAddress();
+        byte[] bytesToWrite = new byte[Voltage.COMMUNICATION_BYTES_SIZE];
+        ByteBuffer.wrap(bytesToWrite).put(address);
+        ByteBuffer.wrap(bytesToWrite).putShort(1, (short) byteValue);
+        ArduinoCommunication.getInstance().writeBytes(bytesToWrite);
+      } catch (Exception ex) {
+        String msg = "Serial port communication error";
+        LogManager.getRootLogger().warn(msg);
+        JOptionPane.showMessageDialog(this,
+            "Serial port communication error");
       }
     }
   }

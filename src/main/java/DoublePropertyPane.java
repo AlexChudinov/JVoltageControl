@@ -2,14 +2,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
 public class DoublePropertyPane extends JPanel {
 
-  private DoublePropertiesCollection collection = new DoublePropertiesCollection();
+  private VoltagePropertiesCollection collection = new VoltagePropertiesCollection();
 
   public DoublePropertyPane() {
     setLayout(new GridBagLayout());

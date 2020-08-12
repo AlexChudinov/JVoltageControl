@@ -3,16 +3,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
-public class DoublePropertiesCollection {
+public class VoltagePropertiesCollection {
 
   private Map<String, VoltageSpinner> spinners = new HashMap<>();
 
   private List<String> order = new ArrayList<>();
 
-  public DoublePropertiesCollection() {
+  public VoltagePropertiesCollection() {
 
   }
 
