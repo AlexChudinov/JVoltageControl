@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 import junit.framework.TestCase;
 
@@ -14,13 +15,9 @@ public class ArduinoCommunicationTest extends TestCase {
     ) {
       byte[] bytesIn = new byte[]{0x30, 0x00, (byte) 0xff};
       communication.writeBytes(bytesIn);
-      List<Byte> bytesOut = communication.readBytes(bytesIn.length);
-      int byteCounter = 0;
-      for (byte b : bytesOut) {
-        System.out.println("Byte #" + byteCounter + ": " + b);
-        assertEquals(b, bytesIn[byteCounter]);
-        byteCounter++;
-      }
+      byte[] bytesOut = communication.readBytes(bytesIn.length);
+      assertTrue(Arrays.equals(bytesOut, bytesIn));
+      System.out.println("bytesOut = " + Arrays.toString(bytesOut));
     } catch (Exception ex) {
       ex.printStackTrace();
     }

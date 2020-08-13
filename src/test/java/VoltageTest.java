@@ -23,7 +23,7 @@ public class VoltageTest extends TestCase {
           voltageCalibrationValues
       );
 
-      List<Byte> bytesRead = comm.readBytes(3);
+      byte[] bytesRead = comm.readBytes(3);
       int byteCounter = 0;
       for(byte b : bytesRead){
         System.out.println("Byte read from port "

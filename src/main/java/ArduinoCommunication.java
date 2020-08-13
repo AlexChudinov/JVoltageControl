@@ -1,6 +1,7 @@
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -16,9 +17,14 @@ public class ArduinoCommunication implements AutoCloseable {
       0x30, 0x00, 0x00
   };
 
-  private static final int MAX_TIME = 3000;
+  private static final int MAX_TIME_MS = 3000;
 
-  private static final int WAIT_TIME_STEP = 1;
+  private static final int WAIT_TIME_STEP_MS = 1;
+
+  private static final int TRANSMISSION_TIME_DELAY_TS = 250;
+
+  private Object transmissionLock = new Object();
+  private AtomicBoolean transmissionReady = new AtomicBoolean();
 
   public static ArduinoCommunication getInstance()
       throws SerialPortException, InterruptedException {
@@ -49,41 +55,35 @@ public class ArduinoCommunication implements AutoCloseable {
       throws SerialPortException, InterruptedException {
     LogManager.getRootLogger().info("Test bytes send to port.");
     writeBytes(TEST_BYTES);
-    List<Byte> bytesRead = readBytes(TEST_BYTES.length);
-    if (bytesRead.size() != TEST_BYTES.length) {
-      return false;
-    } else {
-      boolean result = true;
-      for (int i = 0; i < bytesRead.size(); ++i) {
-        result &= (bytesRead.get(i) == TEST_BYTES[i]);
-      }
-      return result;
-    }
+    return Arrays.equals(readBytes(TEST_BYTES.length), TEST_BYTES);
   }
 
-  public void writeBytes(final byte[] bytes) throws SerialPortException {
-    port.writeBytes(bytes);
-    System.out.println("bytes=" + port.getOutputBufferBytesCount());
+  public void writeBytes(final byte[] bytes)
+      throws SerialPortException, InterruptedException {
+    for(byte b : bytes){
+      writeByte(b);
+    }
+    Thread.sleep(WAIT_TIME_STEP_MS * TRANSMISSION_TIME_DELAY_TS);
     LogManager.getRootLogger().info(
         "Bytes written to port: " + bytesToReadableString(bytes));
+    LogManager.getRootLogger().info(
+        "Bytes in output buffer: " + port.getOutputBufferBytesCount());
   }
 
-  public List<Byte> readBytes(int nBytes)
+  private void writeByte(byte b)
       throws SerialPortException, InterruptedException {
-    List<Byte> byteList = new LinkedList<>();
-    for (int i = 0; i < MAX_TIME && byteList.size() != nBytes; ++i) {
-      Thread.sleep(WAIT_TIME_STEP);
-      byte[] readBytes = port.readBytes();
-      if (Objects.isNull(readBytes)) {
-        continue;
-      }
-      for (byte b : readBytes) {
-        byteList.add(b);
-      }
+    port.writeByte(b);
+    for (int i = 0; i < MAX_TIME_MS && port.getOutputBufferBytesCount() != 0; ++i) {
+      Thread.sleep(WAIT_TIME_STEP_MS);
     }
+  }
+
+  public byte[] readBytes(int nBytes)
+      throws SerialPortException {
+    byte[] bytesRead = port.readBytes(nBytes);
     LogManager.getRootLogger().info(
-        "Bytes read from port: " + bytesToReadableString(byteList));
-    return byteList;
+        "Bytes read from port: " + bytesToReadableString(bytesRead));
+    return bytesRead;
   }
 
   private boolean tryOpenPort(String name) {
@@ -128,7 +128,7 @@ public class ArduinoCommunication implements AutoCloseable {
   private String bytesToReadableString(final byte[] bytes) {
     StringBuilder stringBuilder = new StringBuilder();
     for (byte b : bytes) {
-      stringBuilder.append(b);
+      stringBuilder.append(Integer.toHexString(b & 0xFF));
       stringBuilder.append(" ");
     }
     return stringBuilder.toString();
@@ -136,7 +136,7 @@ public class ArduinoCommunication implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    if(Objects.isNull(communication)){
+    if (Objects.isNull(communication)) {
       return;
     }
     communication.closePort();

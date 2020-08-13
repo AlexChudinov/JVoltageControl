@@ -1,16 +1,19 @@
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 
-public class VoltageTableParams extends DoublePropertyPane {
+public class VoltageParams {
 
-  private static final String DEF_PROPERTIES_FILE_NAME =
+  public class VoltageParamsException extends Exception {
+    public VoltageParamsException(String msg){
+      super(msg);
+    }
+  }
+
+  private static final String PROPERTIES_FILE_NAME =
       "data/config.properties";
 
   private static final List<String> ELECTRODE_NAMES
@@ -40,7 +43,7 @@ public class VoltageTableParams extends DoublePropertyPane {
     put("Accel.", (byte) 0x06);
   }};
 
-  public VoltageTableParams() throws IOException {
+  public VoltageParams() throws IOException {
     //loadProperties();
   }
 

@@ -1,9 +1,11 @@
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import javax.swing.JOptionPane;
 import jssc.SerialPortException;
 
 public class Voltage {
@@ -62,7 +64,7 @@ public class Voltage {
   private void setCalibrationTable(
       TreeSet<Double> calTabValues,
       TreeSet<Integer> calTabBytes)
-      throws VoltageException, SerialPortException {
+      throws VoltageException, SerialPortException, InterruptedException {
     checkTableEntries(calTabBytes, calTabValues);
     calibrationTable.clear();
     Iterator<Double> valueIterator = calTabValues.iterator();
@@ -77,12 +79,14 @@ public class Voltage {
     return value;
   }
 
-  public void setValue(double value) throws SerialPortException {
+  public void setValue(double value)
+      throws SerialPortException, InterruptedException {
     this.value = value;
     writeValueToPort();
   }
 
-  private void writeValueToPort() throws SerialPortException {
+  private void writeValueToPort()
+      throws SerialPortException, InterruptedException {
     if (!Objects.isNull(communication)) {
       communication.writeBytes(valueToBytes());
     }

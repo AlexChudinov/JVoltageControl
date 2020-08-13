@@ -67,7 +67,7 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
             + value.getValue() + " to " + getValue());
         value.setValue((double) getValue());
       }
-    } catch (SerialPortException ex) {
+    } catch (Exception ex) {
       String msg = "Serial port communication error";
       LogManager.getRootLogger().warn(msg);
       JOptionPane.showMessageDialog(this,
@@ -85,6 +85,10 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
 
     private JSpinner byteSpinner;
 
+    private JSpinner spinnerMaxValueControl;
+
+    private JSpinner spinnerStepValueControl;
+
     private DoubleSpinnerWithEdit voltageSpinner;
 
     public PropertiesDlg(JFrame frame, VoltageSpinner spinner) {
@@ -99,30 +103,48 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
     }
 
     private JPanel createSpinnerPanel() {
-      JPanel panel = new JPanel(new GridLayout(0, 2));
+      JPanel panel = new JPanel(new GridBagLayout());
 
       JLabel maxLabel = new JLabel("Max:");
 
       panel.add(maxLabel);
 
-      panel.add(new DoubleSpinnerWithEdit(
+      spinnerMaxValueControl = new DoubleSpinnerWithEdit(
           (Double) ((SpinnerNumberModel) spinner.getModel()).getMaximum(),
           0.0,
           10000.,
           0.1
-      ));
+      );
+      panel.add(spinnerMaxValueControl);
 
       JLabel stepLabel = new JLabel("Step:");
 
       panel.add(stepLabel);
 
-      panel.add(new DoubleSpinnerWithEdit(
+      spinnerStepValueControl = new DoubleSpinnerWithEdit(
           (double) ((SpinnerNumberModel) spinner.getModel()).getStepSize(),
           0.0,
           1000.,
           0.1
-      ));
+      );
+      panel.add(spinnerStepValueControl);
+
+      JButton apply = new JButton("Apply");
+      apply.addActionListener(this::applyVoltageSpinnerParameters);
+
+      panel.add(apply);
+
       return panel;
+    }
+
+    private void applyVoltageSpinnerParameters(ActionEvent actionEvent) {
+      ((SpinnerNumberModel)spinner.getModel())
+          .setStepSize(
+              (Double)spinnerStepValueControl.getModel().getValue());
+      ((SpinnerNumberModel)spinner.getModel())
+          .setMaximum(
+              (Double)spinnerMaxValueControl.getModel().getValue());
+      dispose();
     }
 
     private JPanel createVoltagePanel() {
@@ -166,6 +188,9 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
       byteSpinner = new JSpinner();
       byteSpinner.setModel(
           new SpinnerNumberModel(0, 0, 0xFFFF, 1));
+      ((JSpinner.DefaultEditor)byteSpinner.getEditor())
+          .getTextField()
+          .setHorizontalAlignment(JTextField.CENTER);
       GridBagConstraints valueConstraints = new GridBagConstraints();
       valueConstraints.gridx = 3;
       valueConstraints.gridy = GridBagConstraints.RELATIVE;

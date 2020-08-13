@@ -1,0 +1,62 @@
+[
+  {
+    "name" : "Reflector Grid",
+    "address" : 0,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  },
+  {
+    "name" : "Pulse (-)",
+    "address" : 1,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  },
+  {
+    "name" : "Reflector Plate",
+    "address" : 2,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  },
+  {
+    "name" : "Pulse (+)",
+    "address" : 3,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  },
+  {
+    "name" : "Focusing",
+    "address" : 5,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  },
+  {
+    "name" : "Acceleration",
+    "address" : 6,
+    "min": 0.0,
+    "max" : 10.0,
+    "calibration" : {
+      "voltages" : [0.0, 10.0],
+      "bytes" : [0, 65535]
+    }
+  }
+]

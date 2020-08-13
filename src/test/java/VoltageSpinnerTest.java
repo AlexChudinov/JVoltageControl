@@ -23,7 +23,7 @@ public class VoltageSpinnerTest extends TestCase {
       }};
 
       Voltage voltage = new Voltage(
-          (byte) 0x30,
+          (byte) 0x36,
           5.,
           voltageByteValues,
           voltageCalibrationValues
