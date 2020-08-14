@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,7 +23,7 @@ public class ArduinoCommunication implements AutoCloseable {
 
   private static final int WAIT_TIME_STEP_MS = 1;
 
-  private static final int TRANSMISSION_TIME_DELAY_TS = 250;
+  private static final int TRANSMISSION_TIME_DELAY_TS = 0;
 
   private Object transmissionLock = new Object();
   private AtomicBoolean transmissionReady = new AtomicBoolean();
@@ -73,14 +75,29 @@ public class ArduinoCommunication implements AutoCloseable {
   private void writeByte(byte b)
       throws SerialPortException, InterruptedException {
     port.writeByte(b);
+    Thread.sleep(WAIT_TIME_STEP_MS);
     for (int i = 0; i < MAX_TIME_MS && port.getOutputBufferBytesCount() != 0; ++i) {
       Thread.sleep(WAIT_TIME_STEP_MS);
     }
   }
 
   public byte[] readBytes(int nBytes)
-      throws SerialPortException {
-    byte[] bytesRead = port.readBytes(nBytes);
+      throws SerialPortException, InterruptedException {
+    List<Byte> bytesReadList = new ArrayList<>();
+    for(int i = 0; i < MAX_TIME_MS && bytesReadList.size() != nBytes; ++i){
+      byte[] bytesRead = port.readBytes();
+      if(Objects.isNull(bytesRead)){
+        continue;
+      }
+      for(byte b : bytesRead){
+        bytesReadList.add(b);
+      }
+      Thread.sleep(WAIT_TIME_STEP_MS);
+    }
+    byte[] bytesRead = new byte[bytesReadList.size()];
+    for(int i = 0; i < bytesRead.length; ++i){
+      bytesRead[i] = bytesReadList.get(i);
+    }
     LogManager.getRootLogger().info(
         "Bytes read from port: " + bytesToReadableString(bytesRead));
     return bytesRead;

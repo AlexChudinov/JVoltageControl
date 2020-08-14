@@ -18,7 +18,7 @@ public class Main {
       JPanel panel = new JPanel();
       TreeSet<Double> voltageCalibrationValues = new TreeSet<Double>() {{
         add(0.0);
-        add(3000.0);
+        add(10.0);
       }};
 
       TreeSet<Integer> voltageByteValues = new TreeSet<Integer>() {{
@@ -27,7 +27,7 @@ public class Main {
       }};
 
       Voltage voltage = new Voltage(
-          (byte) 0x30,
+          (byte) 0x36,
           0.,
           voltageByteValues,
           voltageCalibrationValues

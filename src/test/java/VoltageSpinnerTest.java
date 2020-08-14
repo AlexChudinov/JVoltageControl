@@ -14,7 +14,7 @@ public class VoltageSpinnerTest extends TestCase {
       JPanel panel = new JPanel();
       TreeSet<Double> voltageCalibrationValues = new TreeSet<Double>() {{
         add(0.0);
-        add(3000.0);
+        add(10.0);
       }};
 
       TreeSet<Integer> voltageByteValues = new TreeSet<Integer>() {{
