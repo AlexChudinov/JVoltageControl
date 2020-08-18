@@ -1,9 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -24,9 +22,6 @@ public class ArduinoCommunication implements AutoCloseable {
   private static final int WAIT_TIME_STEP_MS = 1;
 
   private static final int TRANSMISSION_TIME_DELAY_TS = 0;
-
-  private Object transmissionLock = new Object();
-  private AtomicBoolean transmissionReady = new AtomicBoolean();
 
   public static ArduinoCommunication getInstance()
       throws SerialPortException, InterruptedException {
@@ -176,5 +171,9 @@ public class ArduinoCommunication implements AutoCloseable {
     communication.closePort();
     communication = null;
     LogManager.getRootLogger().info("Port closed");
+  }
+
+  public String portName(){
+    return port.getPortName();
   }
 }
