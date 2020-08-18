@@ -24,6 +24,23 @@ public class ArduinoCommunicationTest extends TestCase {
 
   }
 
+  public void testGetInstanceString() {
+    try (
+        ArduinoCommunication communication = ArduinoCommunication.getInstance(
+            "/dev/ttyUSB0")
+    ) {
+      byte[] bytesIn = new byte[]{0x30, 0x00, (byte) 0xff};
+      communication.writeBytes(bytesIn);
+      byte[] bytesOut = communication.readBytes(bytesIn.length);
+      assertTrue(Arrays.equals(bytesOut, bytesIn));
+      System.out.println("bytesOut = " + Arrays.toString(bytesOut));
+      ArduinoCommunication.getInstance("/dev/ttyUSB0");
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+
+  }
+
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();

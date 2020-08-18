@@ -40,6 +40,19 @@ public class ArduinoCommunication implements AutoCloseable {
     return communication;
   }
 
+  public static ArduinoCommunication getInstance(String comPortName)
+      throws SerialPortException{
+    if(!Objects.isNull(communication)){
+      if(!communication.port.getPortName().equals(comPortName)){
+        communication.closePort();
+      } else {
+        return communication;
+      }
+    }
+    communication = new ArduinoCommunication(comPortName);
+    return communication;
+  }
+
   private ArduinoCommunication()
       throws SerialPortException, InterruptedException {
     for (String s : SerialPortList.getPortNames()) {
@@ -51,6 +64,10 @@ public class ArduinoCommunication implements AutoCloseable {
         }
       }
     }
+  }
+
+  private ArduinoCommunication(String comPortName){
+    tryOpenPort(comPortName);
   }
 
   private boolean testPort()
