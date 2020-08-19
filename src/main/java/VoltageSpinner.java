@@ -1,12 +1,6 @@
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.nio.ByteBuffer;
 import javax.swing.JButton;
@@ -20,7 +14,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
-import jssc.SerialPortException;
 import org.apache.logging.log4j.LogManager;
 
 public class VoltageSpinner extends DoubleSpinnerWithEdit {
