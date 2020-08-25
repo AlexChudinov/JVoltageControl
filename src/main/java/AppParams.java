@@ -1,10 +1,14 @@
 import java.awt.GridLayout;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import jssc.SerialPortException;
 import org.apache.logging.log4j.LogManager;
@@ -32,19 +36,21 @@ public class AppParams {
   private String portName;
 
   public AppParams() throws Exception {
-    loadProperties();
+    load();
   }
 
   public void initVoltages(int timeDelaySec)
       throws SerialPortException, InterruptedException {
+    ArduinoCommunication communication = ArduinoCommunication.getInstance(portName);
+    this.voltages.values().forEach(a -> a.setCommunication(communication));
     Map<String, Double> curValues = new HashMap<>();
-    for(Map.Entry<String, Voltage> voltage : voltages.entrySet()){
+    for (Map.Entry<String, Voltage> voltage : voltages.entrySet()) {
       curValues.put(voltage.getKey(), voltage.getValue().getValue());
       voltage.getValue().setValue(0.0);
     }
     int timeStepMs = timeDelaySec * 10;
-    for(int i = 1; i <= 100; ++i){
-      for(Map.Entry<String, Voltage> voltage : voltages.entrySet()){
+    for (int i = 1; i <= 100; ++i) {
+      for (Map.Entry<String, Voltage> voltage : voltages.entrySet()) {
         double val = (curValues.get(voltage.getKey()) * i) / 100;
         LogManager.getRootLogger().info("Voltage "
             + voltage.getKey() + " initialised with value: " + val);
@@ -54,22 +60,58 @@ public class AppParams {
     }
   }
 
-  public JPanel getControlPane(){
+  public void stopVoltages(int timeDelaySec)
+      throws Exception {
+    Map<String, Double> curValues = new HashMap<>();
+    for (Map.Entry<String, Voltage> voltage : voltages.entrySet()) {
+      curValues.put(voltage.getKey(), voltage.getValue().getValue());
+    }
+    int timeStepMs = timeDelaySec * 10;
+    for (int i = 100; i >= 0; --i) {
+      for (Map.Entry<String, Voltage> voltage : voltages.entrySet()) {
+        double val = (curValues.get(voltage.getKey()) * i) / 100;
+        voltage.getValue().setValue(val);
+      }
+      Thread.sleep(timeStepMs);
+    }
+    ArduinoCommunication.getInstance().close();
+  }
+
+  public JPanel getControlPane() {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 2));
-    for(Map.Entry<String, VoltageSpinner> spinner : spinners.entrySet()){
-      panel.add(new JLabel(spinner.getKey()));
+    for (Map.Entry<String, VoltageSpinner> spinner : spinners.entrySet()) {
+      JLabel voltageNameLabel = new JLabel(spinner.getKey());
+      voltageNameLabel.setHorizontalAlignment(JTextField.CENTER);
+      voltageNameLabel.setFont(voltageNameLabel.getFont().deriveFont(20.0f));
+      panel.add(voltageNameLabel);
       panel.add(spinner.getValue());
+    }
+    resetSpinnerValues();
+    return panel;
+  }
+
+  public JPanel getInfoPane() {
+    JPanel panel = new JPanel();
+    panel.setLayout(new GridLayout(0, 1));
+    for (Map.Entry<String, VoltageSpinner> spinner : spinners.entrySet()) {
+      JLabel label = new JLabel(spinner.getKey()
+          + ": " + spinner.getValue().getValue());
+      label.setFont(label.getFont().deriveFont(20.0f));
+      resetSpinnerValues();
+      panel.add(label);
     }
     return panel;
   }
 
-  public void loadProperties(String fileName)
+  public void load(String fileName)
       throws Exception {
     JSONParser parser = new JSONParser();
     JSONObject object = (JSONObject) parser.parse(
         new FileReader(fileName));
     JSONArray voltages = (JSONArray) object.get("voltages");
+    this.voltages.clear();
+    spinners.clear();
     for (Object voltageObj : voltages) {
       JSONObject voltage = (JSONObject) voltageObj;
       String name = (String) voltage.get("name");
@@ -84,13 +126,11 @@ public class AppParams {
       this.spinners.put(name, new VoltageSpinner(v, min, max, step));
     }
     portName = (String) object.get("com");
-    ArduinoCommunication communication = ArduinoCommunication.getInstance(portName);
-    this.voltages.values().forEach(a -> a.setCommunication(communication));
   }
 
-  private void loadProperties()
+  private void load()
       throws Exception {
-    loadProperties(DEFAULT_PROPERTIES_FILE_NAME);
+    load(DEFAULT_PROPERTIES_FILE_NAME);
   }
 
   private static Voltage loadVoltage(JSONObject voltage)
@@ -143,21 +183,35 @@ public class AppParams {
     return firstByte >= MIN_BYTE && firstByte <= MAX_BYTE;
   }
 
-  private void saveProperties(){
-    saveProperties(DEFAULT_PROPERTIES_FILE_NAME);
+  private void save() throws IOException {
+    save(DEFAULT_PROPERTIES_FILE_NAME);
   }
 
-  public void saveProperties(String fileName){
-    JSONObject object = new JSONObject();
-    object.put("com", portName);
+  public void save(String fileName) throws IOException {
+    JSONObject obj = new JSONObject();
+    obj.put("com", portName);
     JSONArray voltagesJson = new JSONArray();
-    for(Map.Entry<String, VoltageSpinner> voltage : spinners.entrySet()){
+    for (Map.Entry<String, VoltageSpinner> voltage : spinners.entrySet()) {
       JSONObject o = new JSONObject();
       VoltageSpinner v = voltage.getValue();
       o.put("name", voltage.getKey());
-      o.put("address", voltages.get(voltage.getKey()).getAddress());
-      o.put("value", voltages.get(voltage.getKey()).getValue());
-      o.put("min", ((SpinnerNumberModel)voltage.getValue().getModel()).getMinimum());
+      o.putAll(voltages.get(voltage.getKey()).toJson());
+      o.put("min", ((SpinnerNumberModel) v.getModel()).getMinimum());
+      o.put("max", ((SpinnerNumberModel) v.getModel()).getMaximum());
+      o.put("step", ((SpinnerNumberModel) v.getModel()).getStepSize());
+      voltagesJson.add(o);
+    }
+    obj.put("voltages", voltagesJson);
+    Writer out = new FileWriter(fileName);
+    obj.writeJSONString(out);
+    out.flush();
+    out.close();
+  }
+
+  private void resetSpinnerValues() {
+    for (Map.Entry<String, VoltageSpinner> e : spinners.entrySet()){
+      Voltage v = voltages.get(e.getKey());
+      e.getValue().setValue(v.getValue());
     }
   }
 }

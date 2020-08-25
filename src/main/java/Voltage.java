@@ -1,12 +1,13 @@
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import javax.swing.JOptionPane;
 import jssc.SerialPortException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class Voltage {
 
@@ -120,5 +121,22 @@ public class Voltage {
 
   public byte getAddress() {
     return address;
+  }
+
+  public JSONObject toJson(){
+    JSONObject obj = new JSONObject();
+    obj.put("address", address);
+    obj.put("value", value);
+    JSONObject cal = new JSONObject();
+    JSONArray calValues = new JSONArray();
+    JSONArray calBytes = new JSONArray();
+    for(Map.Entry<Double, Integer> e : calibrationTable.entrySet()){
+      calValues.add(e.getKey());
+      calBytes.add(e.getValue());
+    }
+    cal.put("bytes", calBytes);
+    cal.put("voltages", calValues);
+    obj.put("calibration", cal);
+    return obj;
   }
 }

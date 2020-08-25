@@ -26,9 +26,9 @@ public class DoubleSpinnerWithEdit extends JSpinner {
         .getTextField()
         .addFocusListener(new TextFocusListener());
 
-    ((JSpinner.DefaultEditor) getEditor())
-        .getTextField()
-        .setHorizontalAlignment(JTextField.CENTER);
+    JTextField textField = ((JSpinner.DefaultEditor) getEditor()).getTextField();
+    textField.setHorizontalAlignment(JTextField.CENTER);
+    textField.setFont(textField.getFont().deriveFont(18.0f));
 
     ((JSpinner.DefaultEditor) getEditor())
         .getTextField()
