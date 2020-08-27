@@ -183,7 +183,7 @@ public class AppParams {
     return firstByte >= MIN_BYTE && firstByte <= MAX_BYTE;
   }
 
-  private void save() throws IOException {
+  public void save() throws IOException {
     save(DEFAULT_PROPERTIES_FILE_NAME);
   }
 

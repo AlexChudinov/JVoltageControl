@@ -11,6 +11,7 @@ import org.json.simple.JSONObject;
 
 public class Voltage {
 
+  private static final byte COMMAND = 0x30;
   private static final int MAX_BYTE = 0xFFFF;
   private static final int MIN_BYTE = 0x0000;
   private static final double MIN_VOLTS = 0.0;
@@ -110,7 +111,7 @@ public class Voltage {
           (maxByte - minByte) * value / (maxValue - minValue) + minByte);
     }
 
-    ByteBuffer.wrap(bytes).put(address);
+    ByteBuffer.wrap(bytes).put((byte)(address|COMMAND));
     ByteBuffer
         .wrap(bytes)
         .order(ByteOrder.BIG_ENDIAN)

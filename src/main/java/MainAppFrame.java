@@ -141,8 +141,9 @@ public class MainAppFrame extends JFrame {
             "Voltage params file load: "
                 + file.getAbsolutePath()
         );
-        if(isVoltagesRunning)
+        if (isVoltagesRunning) {
           stop();
+        }
         params.load(file.getAbsolutePath());
         setInfoContent();
       }
@@ -154,7 +155,7 @@ public class MainAppFrame extends JFrame {
   private void saveFileAction(ActionEvent actionEvent) {
     try {
       int approve = fileChooser.showSaveDialog(this);
-      if(approve == JFileChooser.APPROVE_OPTION){
+      if (approve == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
         LogManager.getRootLogger().info(
             "Voltage params file save: "
@@ -179,14 +180,14 @@ public class MainAppFrame extends JFrame {
     }
   }
 
-  private void start() throws Exception{
+  private void start() throws Exception {
     startStopVoltages.setIcon(stopIcon);
     params.initVoltages(SWITCH_TIME_DELAY);
     setControlContent();
     isVoltagesRunning = true;
   }
 
-  private void stop() throws Exception{
+  private void stop() throws Exception {
     startStopVoltages.setIcon(startIcon);
     params.stopVoltages(SWITCH_TIME_DELAY);
     setInfoContent();

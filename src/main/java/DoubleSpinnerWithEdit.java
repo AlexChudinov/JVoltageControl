@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 
 public class DoubleSpinnerWithEdit extends JSpinner {
 
+  private final float FONT_SIZE = 18.0f;
+
   private double value;
 
   private JDialog contextDialog;
@@ -28,7 +30,7 @@ public class DoubleSpinnerWithEdit extends JSpinner {
 
     JTextField textField = ((JSpinner.DefaultEditor) getEditor()).getTextField();
     textField.setHorizontalAlignment(JTextField.CENTER);
-    textField.setFont(textField.getFont().deriveFont(18.0f));
+    textField.setFont(textField.getFont().deriveFont(FONT_SIZE));
 
     ((JSpinner.DefaultEditor) getEditor())
         .getTextField()

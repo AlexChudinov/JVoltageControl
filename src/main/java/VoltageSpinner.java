@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 
 public class VoltageSpinner extends DoubleSpinnerWithEdit {
 
+  private final float FONT_SIZE = 18.0f;
+
   private Voltage value;
 
   public VoltageSpinner(
@@ -181,9 +183,12 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
       byteSpinner = new JSpinner();
       byteSpinner.setModel(
           new SpinnerNumberModel(0, 0, 0xFFFF, 1));
-      ((JSpinner.DefaultEditor)byteSpinner.getEditor())
-          .getTextField()
-          .setHorizontalAlignment(JTextField.CENTER);
+
+      JTextField textField = ((JSpinner.DefaultEditor)byteSpinner.getEditor())
+          .getTextField();
+      textField.setHorizontalAlignment(JTextField.CENTER);
+      textField.setFont(textField.getFont().deriveFont(FONT_SIZE));
+
       GridBagConstraints valueConstraints = new GridBagConstraints();
       valueConstraints.gridx = 3;
       valueConstraints.gridy = GridBagConstraints.RELATIVE;
@@ -233,6 +238,7 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
 
       JLabel value = new JLabel("0x0" + Integer.toHexString(
           spinner.value.getAddress() & 0xF));
+      value.setFont(value.getFont().deriveFont(FONT_SIZE));
       GridBagConstraints valueConstraints = new GridBagConstraints();
       valueConstraints.gridx = 3;
       valueConstraints.gridy = GridBagConstraints.RELATIVE;
