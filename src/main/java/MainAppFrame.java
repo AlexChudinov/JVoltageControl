@@ -1,6 +1,9 @@
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,6 +92,18 @@ public class MainAppFrame extends JFrame {
     createButtons();
 
     setInfoContent();
+
+    addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        try {
+          params.save();
+        } catch (IOException ioException) {
+          JOptionPane.showMessageDialog(e.getWindow(), ioException.getMessage());
+        }
+        e.getWindow().dispose();
+      }
+    });
   }
 
   private void setControlContent() {

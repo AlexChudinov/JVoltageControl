@@ -63,7 +63,11 @@ public class Voltage {
     }
   }
 
-  private void setCalibrationTable(
+  public Map<Double, Integer> getCalibrationTable(){
+    return calibrationTable;
+  }
+
+  public void setCalibrationTable(
       TreeSet<Double> calTabValues,
       TreeSet<Integer> calTabBytes)
       throws VoltageException, SerialPortException, InterruptedException {

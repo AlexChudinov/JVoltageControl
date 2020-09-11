@@ -5,6 +5,7 @@ import java.awt.event.MouseListener;
 import java.text.ParseException;
 import java.util.Objects;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -67,6 +68,11 @@ public class DoubleSpinnerWithEdit extends JSpinner {
       switch (e.getButton()) {
         case MouseEvent.BUTTON3:
           if (!Objects.isNull(contextDialog)) {
+            if(value != 0.0){
+              JOptionPane.showMessageDialog(null,
+                  "Note: before using context dialog. Please, reduce value to 0.0");
+              return;
+            }
             contextDialog.setVisible(true);
           }
           break;

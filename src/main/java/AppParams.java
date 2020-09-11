@@ -74,7 +74,8 @@ public class AppParams {
       }
       Thread.sleep(timeStepMs);
     }
-    ArduinoCommunication.getInstance().close();
+    this.voltages.values().forEach(v -> v.setCommunication(null));
+    resetVoltageValues();
   }
 
   public JPanel getControlPane() {
@@ -94,11 +95,11 @@ public class AppParams {
   public JPanel getInfoPane() {
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(0, 1));
+    resetSpinnerValues();
     for (Map.Entry<String, VoltageSpinner> spinner : spinners.entrySet()) {
       JLabel label = new JLabel(spinner.getKey()
           + ": " + spinner.getValue().getValue());
       label.setFont(label.getFont().deriveFont(20.0f));
-      resetSpinnerValues();
       panel.add(label);
     }
     return panel;
@@ -209,9 +210,15 @@ public class AppParams {
   }
 
   private void resetSpinnerValues() {
-    for (Map.Entry<String, VoltageSpinner> e : spinners.entrySet()){
+    for (Map.Entry<String, VoltageSpinner> e : spinners.entrySet()) {
       Voltage v = voltages.get(e.getKey());
       e.getValue().setValue(v.getValue());
+    }
+  }
+
+  private void resetVoltageValues() throws SerialPortException, InterruptedException {
+    for (Map.Entry<String, VoltageSpinner> e : spinners.entrySet()) {
+      voltages.get(e.getKey()).setValue((Double) e.getValue().getValue());
     }
   }
 }

@@ -9,7 +9,6 @@ public class Main {
       MainAppFrame frame = new MainAppFrame();
       frame.setVisible(true);
       frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
     } catch (Exception ex) {
       ex.printStackTrace();
     }

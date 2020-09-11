@@ -3,6 +3,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -11,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -133,12 +135,12 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
     }
 
     private void applyVoltageSpinnerParameters(ActionEvent actionEvent) {
-      ((SpinnerNumberModel)spinner.getModel())
+      ((SpinnerNumberModel) spinner.getModel())
           .setStepSize(
-              (Double)spinnerStepValueControl.getModel().getValue());
-      ((SpinnerNumberModel)spinner.getModel())
+              (Double) spinnerStepValueControl.getModel().getValue());
+      ((SpinnerNumberModel) spinner.getModel())
           .setMaximum(
-              (Double)spinnerMaxValueControl.getModel().getValue());
+              (Double) spinnerMaxValueControl.getModel().getValue());
       dispose();
     }
 
@@ -153,7 +155,17 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
 
       addButtons(panel);
 
+      addCalTab(panel);
+
       return panel;
+    }
+
+    private void addCalTab(JPanel panel) {
+      GridBagConstraints tableConstraints = new GridBagConstraints();
+      tableConstraints.gridwidth = 6;
+      tableConstraints.gridx = 0;
+      tableConstraints.gridy = GridBagConstraints.RELATIVE;
+      panel.add(showCalTable(), tableConstraints);
     }
 
     private void addButtons(JPanel panel) {
@@ -184,7 +196,7 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
       byteSpinner.setModel(
           new SpinnerNumberModel(0, 0, 0xFFFF, 1));
 
-      JTextField textField = ((JSpinner.DefaultEditor)byteSpinner.getEditor())
+      JTextField textField = ((JSpinner.DefaultEditor) byteSpinner.getEditor())
           .getTextField();
       textField.setHorizontalAlignment(JTextField.CENTER);
       textField.setFont(textField.getFont().deriveFont(FONT_SIZE));
@@ -263,6 +275,21 @@ public class VoltageSpinner extends DoubleSpinnerWithEdit {
         JOptionPane.showMessageDialog(this,
             "Serial port communication error");
       }
+    }
+
+    private JTable showCalTable() {
+      Object[] columnsHeader = new String[]{"Byte:", "Volts:"};
+      Map<Double, Integer> calibrationTable = value.getCalibrationTable();
+      Object[][] tableContent = new Object[20][2];
+      int i = 0;
+      for (Map.Entry<Double, Integer> entry : calibrationTable.entrySet()) {
+        tableContent[i][0] = entry.getValue();
+        tableContent[i][1] = entry.getKey();
+        i++;
+      }
+      JTable table = new JTable(tableContent, columnsHeader);
+      table.setFont(table.getFont().deriveFont(FONT_SIZE));
+      return table;
     }
   }
 }
